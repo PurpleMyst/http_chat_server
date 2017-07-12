@@ -86,6 +86,10 @@ class Server:
             if handler is not None:
                 # We don't pass self because the method is already "bound".
                 await handler(client_sock, headers, json_data)
+            else:
+                await client_sock.send(h11.Response(status_code=405,
+                                                    headers=basic_headers()))
+                await client_sock.send(h11.EndOfMessage())
 
     async def mainloop(self):
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
