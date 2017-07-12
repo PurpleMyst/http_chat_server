@@ -29,7 +29,9 @@ class H11ServerSocket:
             # They've stopped listening.
             # Not much we can do about it here.
             data = b""
+            return False
         self.conn.receive_data(data)
+        return True
 
     async def send(self, event):
         await self.sock.sendall(self.conn.send(event))
@@ -38,15 +40,19 @@ class H11ServerSocket:
         while True:
             event = self.conn.next_event()
             if event is h11.NEED_DATA:
-                await self._recv_data()
-                continue
-            if isinstance(event, h11.ConnectionClosed):
+                still_listening = await self._recv_data()
+                if still_listening:
+                    continue
+                else:
+                    return None
+            elif isinstance(event, h11.ConnectionClosed):
                 return None
-            return event
+            else:
+                return event
 
     async def all_events(self):
         while True:
-            event = self.next_event()
+            event = await self.next_event()
             if event is None:
                 break
             else:
