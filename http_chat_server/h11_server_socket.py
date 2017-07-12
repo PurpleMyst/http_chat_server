@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-import h11
 from wsgiref.handlers import format_date_time
 
-__all__ = ["H11ServerSocket"]
+import h11
+
+__all__ = ["H11ServerSocket", "basic_headers"]
 
 
 def basic_headers():
@@ -22,7 +23,7 @@ class H11ServerSocket:
             go_ahead = \
                 h11.InformationalResponse(status_code=100,
                                           headers=basic_headers())
-            await self._send(go_ahead)
+            await self.send(go_ahead)
         try:
             data = await self.sock.recv(4096)
         except ConnectionError:
