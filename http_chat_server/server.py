@@ -15,6 +15,7 @@ class Server:
         self.sock = socket.socket(family, socket.SOCK_STREAM)
 
         self.client_ids = {}
+        self.missing_messages = {}
 
     async def _handle_client(self, client_sock):
         async with client_sock:
@@ -43,6 +44,7 @@ class Server:
             # restart.
             # We should register this username.
             self.client_ids[username] = random_id()
+            self.missing_messages[username] = []
             return True, self.client_ids[username]
 
     async def mainloop(self):

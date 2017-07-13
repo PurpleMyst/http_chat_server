@@ -19,7 +19,6 @@ class ClientHandler:
 
         self.fetched = False
 
-
     async def _respond_with_json(self, json_data,
                                  extra_headers=None, status_code=200):
         actual_headers = basic_headers()
@@ -60,6 +59,43 @@ class ClientHandler:
                 "success": False,
                 "error": "Invalid authentication."
             }, status_code=400)
+
+        return success
+
+    async def _handle_get(self):
+        username = self.json_data.get("username")
+        missing_messages = self.server.missing_messages.get(username, [])
+
+        valid_authentication = await self._authenticate_then_respond({
+            "messages": missing_messages,
+        })
+
+        if valid_authentication:
+            self.server.missing_messages[username].clear()
+
+    async def _handle_post(self):
+        if "message" not in self.json_data:
+            await self._respond_with_json({
+                "success": False,
+                "error": "No message specified."
+            })
+            return
+        sender = self.json_data["username"]
+        message = self.json_data["message"]
+
+        valid_authentication = await self._authenticate_then_respond({})
+        if not valid_authentication:
+            return
+
+        for username, messages in self.server.missing_messages.items():
+            if username != sender:
+                messages.append((sender, message))
+
+    async def _handle_put(self):
+        # used just for joining without sending anything.
+        await self._authenticate_then_respond({})
+
+    # TODO: Handle the DELETE verb for leaving.
 
     async def fetch_data(self):
         assert not self.fetched, "fetch_data must be called only once!"
