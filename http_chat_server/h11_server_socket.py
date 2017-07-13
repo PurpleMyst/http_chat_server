@@ -1,16 +1,9 @@
 #!/usr/bin/env python3
-from wsgiref.handlers import format_date_time
-
 import h11
 
+from .utils import basic_headers
+
 __all__ = ["H11ServerSocket", "basic_headers"]
-
-
-def basic_headers():
-    return [
-        ("Date", format_date_time(None).encode("ascii")),
-        ("Server", "WeirdChatClient"),
-    ]
 
 
 class H11ServerSocket:
