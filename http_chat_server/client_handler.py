@@ -98,7 +98,7 @@ class ClientHandler:
 
     async def _handle_delete(self):
         if self.json_data.get("username") in self.server.client_ids:
-            authenticated = await self._authenticate_then_respond()
+            authenticated = await self._authenticate_then_respond({})
             if authenticated:
                 username = self.json_data["username"]
                 del self.server.client_ids[username]
