@@ -68,6 +68,7 @@ class ClientHandler:
 
         valid_authentication = await self._authenticate_then_respond({
             "messages": missing_messages,
+            "users": list(self.server.client_ids.keys()),
         })
 
         if valid_authentication:
