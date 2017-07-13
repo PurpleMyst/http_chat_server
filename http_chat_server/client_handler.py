@@ -95,7 +95,13 @@ class ClientHandler:
         # used just for joining without sending anything.
         await self._authenticate_then_respond({})
 
-    # TODO: Handle the DELETE verb for leaving.
+    async def _handle_delete(self):
+        if self.json_data.get("username") in self.server.client_ids:
+            authenticated = await self._authenticate_then_respond()
+            if authenticated:
+                username = self.json_data["username"]
+                del self.server.client_ids[username]
+                del self.server.missing_messages[username]
 
     async def fetch_data(self):
         assert not self.fetched, "fetch_data must be called only once!"
